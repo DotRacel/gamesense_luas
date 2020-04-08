@@ -4,26 +4,20 @@ local config = {
     reset = ui.reference("CONFIG", "Presets", "Reset"),
 }
 
-local lock, status = ui.new_checkbox("CONFIG", "Presets", "Lock config"), database.read("lock_config")
-
-if(status ~= nil) then ui.set(lock, status) end
-
 local function set_visible(boolean)
     for k, v in pairs(config) do
         ui.set_visible(v, boolean)
     end
 end
 
-local function update_visibility()
-    local locked = ui.get(lock)
-    database.write("lock_config", locked)
+local lock = ui.new_button("CONFIG", "Presets", "Unlock for 5s", function(this)
+    ui.set_visible(this, false)
+    set_visible(true)
 
-    if(locked) then
+    client.delay_call(5, function()
+        ui.set_visible(this, true)
         set_visible(false)
-    else
-        set_visible(true)
-    end
-end
+    end)
+end)
 
-update_visibility()
-ui.set_callback(lock, update_visibility)
+set_visible(false)
